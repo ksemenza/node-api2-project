@@ -74,7 +74,7 @@ When the client makes a GET request to /api/posts/:id/comments:
 
 */
 
-router.get(`/:id/commets`, (req, res) => {
+router.get(`/:id/comments`, (req, res) => {
     const id = req.params.id;
     db.findById(id)
     .then(blogPost => {
@@ -174,6 +174,64 @@ When the client makes a POST request to /api/posts/:id/comments:
 
 */
 
+router.post(`/:id/comments`, (req, res) => {
+    const id = req.params.id
+    const comment = req.body
+
+    if(!comment.text) {
+        res.status(400).json({errorMessage:'Provide text for comment'})
+    }
+    if(!comment.post_id) {
+        res.status(400),json({errorMessage: 'Provied the post_id'})
+    }
+    db.findById(id)
+    .then(blogPost => {
+        if(blogPost.length < 1) {
+            res.status(404).json({message: 'Post with that ID does not exisit'})
+        } else {
+            db.insertComment(comment)
+            .then(idObj => {
+                console.log(idObj)
+                db.findCommentById(idObj.id)
+                .then(newComment => {
+                    console.log(newComment)
+                    res.status(201).json(newComment)
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).json({error: 'Error saving comment to database'})
+            })
+        }
+    })
+})
+
+
+/*
+When the client makes a PUT request to /api/posts/:id:
+
+    If the post with the specified id is not found:
+        return HTTP status code 404 (Not Found).
+        return the following JSON object: { message: "The post with the specified ID does not exist." }.
+
+    If the request body is missing the title or contents property:
+        cancel the request.
+        respond with HTTP status code 400 (Bad Request).
+        return the following JSON response: { errorMessage: "Please provide title and contents for the post." }.
+
+    If there's an error when updating the post:
+        cancel the request.
+        respond with HTTP status code 500.
+        return the following JSON object: { error: "The post information could not be modified." }.
+
+    If the post is found and the new information is valid:
+        update the post document in the database using the new information sent in the request body.
+        return HTTP status code 200 (OK).
+        return the newly updated post.
+
+*/
+
+
 router.put(`/:id`, (req, res) => {
     const id = req.params
     const updatedPost = req.body
@@ -207,32 +265,6 @@ router.put(`/:id`, (req, res) => {
 })
 
 /*
-When the client makes a PUT request to /api/posts/:id:
-
-    If the post with the specified id is not found:
-        return HTTP status code 404 (Not Found).
-        return the following JSON object: { message: "The post with the specified ID does not exist." }.
-
-    If the request body is missing the title or contents property:
-        cancel the request.
-        respond with HTTP status code 400 (Bad Request).
-        return the following JSON response: { errorMessage: "Please provide title and contents for the post." }.
-
-    If there's an error when updating the post:
-        cancel the request.
-        respond with HTTP status code 500.
-        return the following JSON object: { error: "The post information could not be modified." }.
-
-    If the post is found and the new information is valid:
-        update the post document in the database using the new information sent in the request body.
-        return HTTP status code 200 (OK).
-        return the newly updated post.
-
-*/
-
-
-
-/*
 When the client makes a DELETE request to /api/posts/:id:
 
     If the post with the specified id is not found:
@@ -246,10 +278,87 @@ When the client makes a DELETE request to /api/posts/:id:
 
 */
 
+router.delete(`/:id`, (req, res) => {
+    const id = req.params.id
+    db.findById(id)
+    .then(blogPost => {
+        console.log(blogPost)
+        if(blogPost.length < 1) {
+            res.status(404).json({message: 'Post with ID does not exisit'})
+        } else {
+            db.remove(id)
+            .then(numRecDel => {
+                console.log(numRecDel)
+                if(numRecDel !== 1) {
+                    res.status(500).json({error: 'Post could not be removed'})
+                } else  {
+                    res.status(200).json(blogPost)
+                }
+            })
+            .catch(err => {
+                res.status(500).json({error: 'Post could not be removed'})
+            })
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({message: 'Error in retrieving post with that ID'})
+    })
+})
 
-    /*
+router.get(`comments/:id`, (req, res) => {
+    const id = req.params.id
+    db.findCommentById(id)
+    .then(res => {
+        console.log(res)
+        res.status(200).json(res)
+    })
+
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error:'Comment could not be retrieved'})
+    })
+})
+
+router.delete(`/comments/:id`, validateCommentId, (req, res) => {
+    const id = req.params.id
+    db.remove(id)
+    .then(resp => {
+        console.log(resp)
+        res.status(200).json({numRecDel: resp})
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error:"The comment could not be deleted"})
+    })
+})
+ /*
     body looks like this: {"id": 40, "text": "blah", "post_id": 18}
     */
 
 
-    module.exports = router
+router.put(`/comments/:id`, validateCommentId, (req, res) => {
+    const id = req.params.id
+    db.editComment(id, req.body)
+    .then(resp => {
+        console.log(resp)
+        res.status(200).json(resp)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error:err, message:'Unable to update comment'})
+    })
+})
+
+function validateCommentId(req, res, next) {
+    const id = req.params.id
+    db.findCommentById(id)
+    .then(resp => {
+        next()
+    })
+    .catch(err => {
+        res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
+    })
+}
+   
+module.exports = router
