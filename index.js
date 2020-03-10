@@ -9,6 +9,6 @@ server.get('/',(req, res) => {
     res.send('Welcome to the blog')
 })
 
-const port = process.env.PORT || 9000;
+const PORT = 9000;
 
-server.listen(port, ()=> console.log(`server running on port${port}`))
+server.listen(PORT, ()=> console.log(`server running on port${PORT}`))

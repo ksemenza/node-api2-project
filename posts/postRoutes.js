@@ -13,7 +13,18 @@ When the client makes a GET request to /api/posts:
 
 */
 
+router.get('/', (req, res)=> {
+    db.find()
+    .then(posts => {
+        console.log(posts)
+        res.status(200).json(posts)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500),json({error: 'The post info was not retrieved'})
+    } )
 
+})
 
 
 /*
@@ -31,9 +42,22 @@ When the client makes a GET request to /api/posts/:id:
 */
 
 
-
-
-
+router.get('/:id', (req, res)=> {
+    const id = req.params.id;
+    db.findById(id)
+    .then(blogPost => {
+        console.log(blogPost)
+        if(blogPost.length > 0) {
+            res.status(200).json(blogPost)
+        } else {
+            res.status(404).json({message: "Post with that ID does not exisit"})
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error:'Post info not retrieved'})
+    })
+})
 
 
 /*
@@ -49,6 +73,34 @@ When the client makes a GET request to /api/posts/:id/comments:
         return the following JSON object: { error: "The comments information could not be retrieved." }.
 
 */
+
+router.get(`/:id/commets`, (req, res) => {
+    const id = req.params.id;
+    db.findById(id)
+    .then(blogPost => {
+        if(blogPost.length < 1) {
+            res.status(500).json({message:'Post ID does not exist'})
+        }
+    })  
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error: 'Post info could not be retrieved'})
+    })
+
+    db.findPostComments(id)
+    .then(comments => {
+        console.log(comments)
+        if(comments.length > 0) {
+            res.status(200).json(comments)
+        } else {
+            res.status(500).json({message: 'Post with ID has not comments'})
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error: 'Comments info could not be retrieved'})
+    })
+})
 
 
 /*
@@ -70,6 +122,32 @@ When the client makes a POST request to /api/posts:
         return the following JSON object: { error: "There was an error while saving the post to the database" }.
 
 */
+
+router.post('/', (req, res) => {
+    const newPost = req.body
+    if(!newPost.title || !newPost.contents) {
+        res.status(400).json({errorMessage: 'Provide title and contents for post'})
+    }
+
+    db.insert(newPost)
+    .then(idObj => {
+        console.log(idObj)
+        db.findById(idObj.id)
+        .then(blogPost => {
+            console.log(blogPost)
+            res.status(201).json(blogPost)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: 'Error with saving post to database'})
+        })
+    })
+
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({error: 'Error with saivng post to database'})
+    })
+})
 
 
 /*
@@ -96,6 +174,37 @@ When the client makes a POST request to /api/posts/:id/comments:
 
 */
 
+router.put(`/:id`, (req, res) => {
+    const id = req.params
+    const updatedPost = req.body
+
+    if(!updatedPost.title || !updatedPost.contents) {
+        res.status(400).json({errorMessage: 'Provide title and contents for post'})
+    }
+    db.findById(id)
+    .then(blogPost => {
+        if(blogPost.length < 1) {
+            res.status(404).json({message:'Post with ID does not exisit'})
+        } else {
+            db.update(id, updatedPost)
+            .then(updateRecords => {
+                if(updateRecords !==1) {
+                    res.status(500).json({error: 'Post info could not be changed'})
+                } else  {
+                    db.findById(id)
+                    .then(blogPost => {
+                        console.log(blogPost)
+                        res.status(201).json(blogPost)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).json({error:'Error in retrieving updated post form database'})
+                    })
+                }
+            })
+        }
+    })
+})
 
 /*
 When the client makes a PUT request to /api/posts/:id:
@@ -141,3 +250,6 @@ When the client makes a DELETE request to /api/posts/:id:
     /*
     body looks like this: {"id": 40, "text": "blah", "post_id": 18}
     */
+
+
+    module.exports = router
