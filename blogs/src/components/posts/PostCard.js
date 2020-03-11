@@ -31,15 +31,15 @@ const handleChange = e => {
 
 return (
     <div className='post-cta'>
+        {/* <button onClick={handleEditClick}>{!editMode? 'Edit' : 'Cancel'}</button> */}
+
+        
+        <div>
         <h4>{post.title}</h4>
         <p>{post.contents}</p>
         <button className='edit' onClick={handleEditClick}>Edit</button>
-
-
         <button className='delete' onClick={handleDeleteClick}>Delete</button>
-
-
-
+</div>
 <div className='post-edit'>
    {editing && <form onSubmit={handleSubmit}>
     <h4>Editing {post.title}</h4>

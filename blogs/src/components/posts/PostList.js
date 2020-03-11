@@ -8,6 +8,11 @@ const PostList = props => {
 
     const [post, setPost] = useState()
     const [loading, setLoading] = useState(false)
+    const [addMode, setAddMode] = useState(false)
+
+    const handleClickAdd = () => {
+        setAddMode(!addMode)
+    }
 
     useEffect(() => {
         axiosAuth().get(`/`)
@@ -71,9 +76,11 @@ const PostList = props => {
     return(
         <div>
 
-          
+    <button onClick={handleClickAdd}>{!addMode? `New Post` : 'Cancel'}</button>
+    {addMode? <PostAdd addPost={addPost} toggleAdd={handleClickAdd}/> :
             <div className='post-content'>
-            <PostAdd addPost={addPost}/>
+                
+    
            
                 {post && post.map(post => {
                     return(
@@ -92,6 +99,7 @@ const PostList = props => {
             
 
             </div>
+}
         </div>
     )
 
