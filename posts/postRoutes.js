@@ -364,9 +364,9 @@ router.delete(`/comments/:id`,  (req, res) => {
     */
 
 
-router.put(`/comments/:id`, validateCommentId, (req, res) => {
+router.put(`/comments/:id`, (req, res) => {
     const id = req.params.id
-    db.editComment(id, req.body)
+    db.updateComments(id, req.body)
     .then(resp => {
         console.log(resp)
         res.status(200).json(resp)
@@ -377,16 +377,16 @@ router.put(`/comments/:id`, validateCommentId, (req, res) => {
     })
 })
 
-function validateCommentId(req, res, next) {
-    const id = req.params.id
-    db.findCommentById(id)
-    .then(resp => {
-        next()
-    })
-    .catch(err => {
-        res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
-    })
+// function validateCommentId(req, res, next) {
+//     const id = req.params.id
+//     db.findCommentById(id)
+//     .then(resp => {
+//         next()
+//     })
+//     .catch(err => {
+//         res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
+//     })
    
-}
+// }
    
 module.exports = router
