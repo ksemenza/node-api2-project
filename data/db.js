@@ -11,6 +11,7 @@ module.exports = {
   findPostComments,
   findCommentById,
   insertComment,
+  deleteComments
 };
 
 function find() {
@@ -39,6 +40,7 @@ function remove(id) {
     .del();
 }
 
+
 function findPostComments(postId) {
   return db('comments')
     .join('posts', 'posts.id', 'post_id')
@@ -57,4 +59,11 @@ function insertComment(comment) {
   return db('comments')
     .insert(comment)
     .then(ids => ({ id: ids[0] }));
+}
+
+
+function deleteComments(id) {
+  return db('comments')
+  .where('id', Number(id))
+  .del()
 }

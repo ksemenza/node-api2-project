@@ -1,10 +1,10 @@
 const express  = require('express')
+const shortid = require('shortid')
 const router = express.Router()
 const db = require('../data/db.js')
 const cors = require('cors')
-router.use(cors())
 
-let blogPost = []
+let comments = []
 
 const allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
@@ -92,6 +92,7 @@ router.get(`/:id/comments`, (req, res) => {
         if(blogPost.length < 1) {
             res.status(500).json({message:'Post ID does not exist'})
         }
+        return
     })  
     .catch(err => {
         console.log(err)
@@ -134,18 +135,20 @@ When the client makes a POST request to /api/posts:
 
 */
 
+
+
 router.post('/', (req, res) => {
     const newPost = req.body
     if(!newPost.title || !newPost.contents) {
         res.status(400).json({errorMessage: 'Provide title and contents for post'})
     }
-
     db.insert(newPost)
     .then(idObj => {
         console.log(idObj)
         db.findById(idObj.id)
         .then(blogPost => {
-            console.log(blogPost)
+
+         
             res.status(201).json(blogPost)
         })
         .catch(err => {
@@ -184,38 +187,51 @@ When the client makes a POST request to /api/posts/:id/comments:
         return the following JSON object: { error: "There was an error while saving the comment to the database" }.
 
 */
-
 router.post(`/:id/comments`, (req, res) => {
-    const id = req.params.id
-    const comment = req.body
-
-    if(!comment.text) {
-        res.status(400).json({errorMessage:'Provide text for comment'})
+ 
+    const id = req.params.id;
+    console.log(id)
+    const comment = req.body;
+    if (!comment.text) {
+        res.status(400).json({ errorMessage: "Please provide text for the comment." });
+        
     }
-    if(!comment.post_id) {
-        res.status(400),json({errorMessage: 'Provied the post_id'})
+    if (!comment.post_id) {
+        res.status(400).json({ errorMessage: "Please provide the post_id."});
+        return
     }
     db.findById(id)
-    .then(blogPost => {
-        if(blogPost.length < 1) {
-            res.status(404).json({message: 'Post with that ID does not exisit'})
-        } else {
-            db.insertComment(comment)
-            .then(idObj => {
-                console.log(idObj)
-                db.findCommentById(idObj.id)
-                .then(newComment => {
-                    console.log(newComment)
-                    res.status(201).json(newComment)
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                res.status(500).json({error: 'Error saving comment to database'})
-            })
-        }
-    })
-})
+        .then(blogPost => {
+            if (blogPost.length < 1) {
+                res.status(404).json( { message: "The post with the specified ID does not exist." })
+                return
+            } else {
+                db.insertComment(comment)
+                    .then(idObject => {
+                        console.log(idObject);
+                        db.findCommentById(idObject.id)
+                            .then(newComment => {
+                                console.log(newComment);
+                            
+                                res.status(201).json(newComment);
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                res.status(500).json({ error: "There was an error while retrieving the comment from the database." })
+                            });
+                    })
+                    .catch(err => {
+                        console.log(err);
+                        res.status(500).json({ error: "There was an error while saving the comment to the database" });
+                    });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "There was an error while finding the post with the specified id."});
+        });
+});
+
 
 
 /*
@@ -317,7 +333,7 @@ router.delete(`/:id`, (req, res) => {
     })
 })
 
-router.get(`comments/:id`, (req, res) => {
+router.get(`/comments/:id`, (req, res) => {
     const id = req.params.id
     db.findCommentById(id)
     .then(res => {
@@ -331,9 +347,9 @@ router.get(`comments/:id`, (req, res) => {
     })
 })
 
-router.delete(`/comments/:id`, validateCommentId, (req, res) => {
+router.delete(`/comments/:id`,  (req, res) => {
     const id = req.params.id
-    db.remove(id)
+    db.deleteComments(id)
     .then(resp => {
         console.log(resp)
         res.status(200).json({numRecDel: resp})
@@ -370,6 +386,7 @@ function validateCommentId(req, res, next) {
     .catch(err => {
         res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
     })
+   
 }
    
 module.exports = router

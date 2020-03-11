@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 
 
 const CommentCard = (props) => {
@@ -8,7 +8,7 @@ const CommentCard = (props) => {
 return (
 
     <div>
-        
+
     </div>
 
     /*

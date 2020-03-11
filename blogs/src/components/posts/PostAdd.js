@@ -21,10 +21,10 @@ const PostAdd = props => {
         
             <form className='form-add' onSubmit={handleSubmit}>
                 <label htmlFor='title'>Title</label>
-                <input type='text' name='title' value={post.title} onChange={handleChange}/>
+                <input required type='text' name='title' value={post.title} onChange={handleChange}/>
     
                 <label htmlFor='contents'>Contents</label>
-                <textarea type='textbox' name='contents' className='content-text' value={post.contents} onChange={handleChange}/>
+                <textarea required type='textbox' name='contents' className='content-text' value={post.contents} onChange={handleChange}/>
 
 
                 <button type='submit'>submit</button>

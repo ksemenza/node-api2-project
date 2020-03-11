@@ -1,6 +1,5 @@
 import React, {useState} from 'react'
-import CommentList from '../comments/CommentList'
-
+import PostEdit from './PostEdit'
 
 const PostCard = ({post, deletePost, editPost}) => {
 const [editing, setEditing] = useState(false)
@@ -57,11 +56,7 @@ return (
 </div>
 
     </div>
-
-
 )
-
-
 }
 
 export default PostCard 

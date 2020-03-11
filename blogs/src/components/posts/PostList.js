@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import PostCard from './PostCard'
 import PostAdd from './PostAdd'
-import axios from 'axios'
 import axiosAuth from '../axiosAuth'
 
 const PostList = props => {
@@ -75,7 +74,7 @@ const PostList = props => {
  */
     return(
         <div>
-
+{loading}
     <button onClick={handleClickAdd}>{!addMode? `New Post` : 'Cancel'}</button>
     {addMode? <PostAdd addPost={addPost} toggleAdd={handleClickAdd}/> :
             <div className='post-content'>
@@ -85,19 +84,13 @@ const PostList = props => {
                 {post && post.map(post => {
                     return(
                        
-                    <PostCard id={post.id} title={post.title} contents={post.contents} post={post} deletePost={deletePost} editPost={editPost}/> 
+                    <PostCard key={post.id} title={post.title} contents={post.contents} post={post} deletePost={deletePost} editPost={editPost}/> 
                
                         )
                 }
                 )
                 
                 }
-
-             
-       
-
-            
-
             </div>
 }
         </div>
