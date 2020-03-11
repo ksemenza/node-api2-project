@@ -1,10 +1,7 @@
 const express  = require('express')
-const shortid = require('shortid')
 const router = express.Router()
 const db = require('../data/db.js')
-const cors = require('cors')
 
-let comments = []
 
 const allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
@@ -12,7 +9,6 @@ const allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
 }
-
 
 /* 
 When the client makes a GET request to /api/posts:
@@ -333,7 +329,7 @@ router.delete(`/:id`, (req, res) => {
     })
 })
 
-router.get(`/comments/:id`, (req, res) => {
+router.get(`/comments/:id`,validateCommentId, (req, res) => {
     const id = req.params.id
     db.findCommentById(id)
     .then(res => {
@@ -347,7 +343,7 @@ router.get(`/comments/:id`, (req, res) => {
     })
 })
 
-router.delete(`/comments/:id`,  (req, res) => {
+router.delete(`/comments/:id`, validateCommentId, (req, res) => {
     const id = req.params.id
     db.deleteComments(id)
     .then(resp => {
@@ -364,7 +360,7 @@ router.delete(`/comments/:id`,  (req, res) => {
     */
 
 
-router.put(`/comments/:id`, (req, res) => {
+router.put(`/comments/:id`,  validateCommentId, (req, res) => {
     const id = req.params.id
     db.updateComments(id, req.body)
     .then(resp => {
@@ -377,16 +373,16 @@ router.put(`/comments/:id`, (req, res) => {
     })
 })
 
-// function validateCommentId(req, res, next) {
-//     const id = req.params.id
-//     db.findCommentById(id)
-//     .then(resp => {
-//         next()
-//     })
-//     .catch(err => {
-//         res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
-//     })
+function validateCommentId(req, res, next) {
+    const id = req.params.id
+    db.findCommentById(id)
+    .then(resp => {
+        next()
+    })
+    .catch(err => {
+        res.status(500).json({error:err, message: `Comment with id ${id} could not be retrieved`})
+    })
    
-// }
+}
    
 module.exports = router
