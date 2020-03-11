@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <header className="App-header">
     
-    
+      <h2>Kim's Blog Posting</h2>
       </header>
       <PostList/>
       <CommentList/>

@@ -71,7 +71,7 @@ const PostList = props => {
     return(
         <div>
 
-            <h2>Kim's Blog Posting</h2>
+          
             <div className='post-content'>
             <PostAdd addPost={addPost}/>
            
