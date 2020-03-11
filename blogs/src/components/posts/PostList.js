@@ -65,11 +65,13 @@ const PostList = props => {
             
     }
 
-
+/**
+ TODO: Change hard coded name to auth user name
+ */
     return(
         <div>
-         
-            <h2>Posts</h2>
+
+            <h2>Kim's Blog Posting</h2>
             <div className='post-content'>
             <PostAdd addPost={addPost}/>
            

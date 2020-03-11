@@ -47,7 +47,7 @@ return (
                 <input type='text' name='title' value={postEdit.title} onChange={handleChange}/>
     
                 <label htmlFor='contents'>Contents</label>
-                <input type='textbox' name='contents' className='content-text' value={postEdit.contents} onChange={handleChange}/>
+                <textarea type='textbox' name='contents' className='content-text' value={postEdit.contents} onChange={handleChange}/>
 
 
                 <button type='submit'>submit</button>

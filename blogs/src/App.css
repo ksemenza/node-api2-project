@@ -37,6 +37,15 @@
   }
 }
 
+form {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 auto;
+}
+
 .form-add {
   display: flex;
   flex-direction: column;
@@ -47,11 +56,16 @@
 }
 
 label {
-  margin-bottom: 15px;
+  margin-bottom: 7px;
+  font-weight: 500;
+  font-size: 21px;
 }
 input {
   width: 300px;
   margin-bottom: 15px;
+  padding: 5px;
+  font-size: 15px;
+
 }
 
 button {
@@ -61,6 +75,7 @@ button {
 .content-text {
   height: 125px;
   width: 300px;
-  font-size: 12px;
+  font-size: 15px;
+  padding: 6px;
 
 }
