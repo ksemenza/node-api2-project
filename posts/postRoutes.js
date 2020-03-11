@@ -1,6 +1,17 @@
-const express  =require('express')
+const express  = require('express')
 const router = express.Router()
 const db = require('../data/db.js')
+const cors = require('cors')
+router.use(cors())
+
+let blogPost = []
+
+const allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
 
 
 /* 
@@ -233,7 +244,7 @@ When the client makes a PUT request to /api/posts/:id:
 
 
 router.put(`/:id`, (req, res) => {
-    const id = req.params
+    const id  = req.params.id
     const updatedPost = req.body
 
     if(!updatedPost.title || !updatedPost.contents) {
